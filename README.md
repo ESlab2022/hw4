@@ -1,2 +1,2 @@
-# hw4
-BLE  communication between RPi(Central) and STM32(Peripheral)
+# HW4
+Peripheral in mbed-os (stm32) and Central in Python (RPi)
