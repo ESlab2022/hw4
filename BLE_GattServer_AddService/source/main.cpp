@@ -1,4 +1,6 @@
 #include <cstdlib>
+#include "MyHeartRateService.h"
+#include "MagneticFieldService.h"
 #include <events/mbed_events.h>
 #include <mbed.h>
 #include "ble/BLE.h"
@@ -6,9 +8,6 @@
 
 #include "pretty_printer.h"
 #include "mbed-trace/mbed_trace.h"
-#include "ble/services/HeartRateService.h"
-
-#include "MagneticFieldService.h"
 #include "stm32l475e_iot01_magneto.h"
 
 
@@ -26,9 +25,9 @@ public:
         _magnetic_field_uuid(MagneticFieldService::MAGNETIC_FIELD_SERVICE_UUID),
         _magnetic_field_value(nullptr),
         _magnetic_field_service(ble),
-        _heartrate_uuid(GattService::UUID_HEART_RATE_SERVICE),
+        _heartrate_uuid(MyHeartRateService::HEART_RATE_SERVICE_UUID),
         _heartrate_value(100),
-        _heartrate_service(ble, _heartrate_value, HeartRateService::LOCATION_FINGER),
+        _heartrate_service(ble),
         _adv_data_builder(_adv_buffer)
     {
     }
@@ -112,7 +111,7 @@ private:
             return;
         }
 
-        printf("Magnetic field sensor advertising, please connect\r\n");
+        printf("Magnetic field sensor and heart rate sensor advertising, please connect\r\n");
     }
 
     void update_mag_sensor_value(){
@@ -130,7 +129,8 @@ private:
         if (_heartrate_value == 110) {
             _heartrate_value = 60;
         }
-        _heartrate_service.updateHeartRate(_heartrate_value);
+        printf("%d bpm", _heartrate_value);
+        _heartrate_service.updateHeartRate(&_heartrate_value);
     }
 
 private:
@@ -142,8 +142,8 @@ private:
     MagneticFieldService _magnetic_field_service;
 
     UUID _heartrate_uuid;
-    uint16_t _heartrate_value;
-    HeartRateService _heartrate_service;
+    uint8_t _heartrate_value;
+    MyHeartRateService _heartrate_service;
 
     uint8_t _adv_buffer[ble::LEGACY_ADVERTISING_MAX_SIZE];
     ble::AdvertisingDataBuilder _adv_data_builder;
